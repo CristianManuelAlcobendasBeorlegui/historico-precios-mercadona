@@ -16,10 +16,10 @@ return new class extends Migration
             $table->string('name');
             $table->string('mercadona_id');
             $table->json('categories_id')->nullable();
-            $table->string('thumbnail');
-            $table->string('share_url');
+            $table->string('thumbnail')->nullable();
+            $table->string('share_url')->nullable();
             $table->double('price');
-            $table->json('price_history')->nullable();
+            $table->json('price_history')->default(json_encode([]));
             $table->timestamps();
         });
     }
