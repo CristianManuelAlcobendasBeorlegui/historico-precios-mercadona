@@ -40,4 +40,13 @@ class CategoryController extends Controller {
             }
         }
     }
+
+    /** 
+     * Devuelve un array con todas las subcategorias guardadas en BD.
+     * 
+     * @return array
+     * */
+    public function obtenerSubcategorias() {
+        return json_decode(Category::whereRaw('mercadona_id != mercadona_main_category_id')->get(), true);
+    }
 }
