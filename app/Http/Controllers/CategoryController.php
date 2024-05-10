@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 // === LIBRERIAS === //
 use App\Models\Category;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller {
@@ -14,9 +15,11 @@ class CategoryController extends Controller {
      * Actualiza / Importa las categorias del Mercadona.
      * */
     public function actualizaCategorias(): void {
+        $guzzleClient = new Client();
+
         // Consigue todas las categorias
-        $response = file_get_contents('https://tienda.mercadona.es/api/categories');
-        $arrayCategories = json_decode($response, true)["results"];
+        $response = $guzzleClient->request('GET', 'https://tienda.mercadona.es/api/categories/');
+        $arrayCategories = json_decode($response->getBody(), true)['results'];
 
         // Para cada categoria actualiza / importa sus datos
         foreach ($arrayCategories as $category) {
