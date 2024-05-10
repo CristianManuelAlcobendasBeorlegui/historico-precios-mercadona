@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->integer('mercadona_id');
+            $table->integer('mercadona_main_category_id');
             $table->timestamps();
         });
     }
