@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use Telegram\Bot\Laravel\Facades\Telegram;
 
 class ProductController extends Controller {
     // === METODOS === //
@@ -63,6 +64,13 @@ class ProductController extends Controller {
                     if (count($arrayPriceHistory) > 0) {
                         // Comprueba si el precio actual es diferente al del historico
                         if ($arrayPriceHistory[0]['price'] != $dbProduct['price']) {
+                            // Envia una notificacion a Telegram
+                            Telegram::sendMessage([
+                                'chat_id' => env('TELEGRAM_CHANNEL_ID'),
+                                'parse_mode' => 'HTML',
+                                'text' => ProductController::generaPlantillaCambioPrecio($dbProduct['thumbnail'], $dbProduct['name'], $dbProduct['name'], $arrayPriceHistory[0]['price'], $dbProduct['price'], $dbProduct['share_url'])
+                            ]);
+                        
                             // Anyade la fecha actual y el precio
                             array_unshift($arrayPriceHistory, [ 'date' => date('d-m-y H:i'), 'price' => $dbProduct['price'] ]);
                         }
@@ -78,5 +86,24 @@ class ProductController extends Controller {
                 }
             }
         }
+    }
+    
+    /** 
+     * Devuelve un mensaje de plantilla para cuando un producto cambie de precio
+     * 
+     * @param string $src -Enlace de la imagen.
+     * @param string $alt - Texto altenativo si la ruta de la imagen no existe.
+     * @param string $productName - Nombre del producto.
+     * @param string $lastPrice - Ultimo precio del producto.
+     * @param string $currentPrice - Precio actual del produccto.
+     * @param string $url - URL para acceder al producto.
+     * 
+     * @return string
+     * */
+    private static function generaPlantillaCambioPrecio(string $src, string $alt, string $productName, string $lastPrice, string $currentPrice, string $url): string {
+        return $productName . " ha cambiado de precio!\n\n"
+                . "<b>Precio anterior:</b> " . $lastPrice . "€\n\n"
+                . "<b>Precio actual:</b> " . $currentPrice . "€\n\n"
+                . "<b>URL:</b> " . $url . "\n";
     }
 }
